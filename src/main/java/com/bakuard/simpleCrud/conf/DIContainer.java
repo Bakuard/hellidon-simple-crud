@@ -4,6 +4,9 @@ import com.bakuard.simpleCrud.dal.GroupRepository;
 import com.bakuard.simpleCrud.dal.StudentRepository;
 import com.bakuard.simpleCrud.dal.impl.GroupRepositoryImpl;
 import com.bakuard.simpleCrud.dal.impl.StudentRepositoryImpl;
+import com.bakuard.simpleCrud.service.GroupService;
+import com.bakuard.simpleCrud.service.StudentService;
+import com.bakuard.simpleCrud.service.TransactionUtil;
 import com.bakuard.simpleCrud.service.ValidatorUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -92,5 +95,25 @@ public class DIContainer {
             Validator validator = factory.getValidator();
             return new ValidatorUtil(validator);
         });
+    }
+
+    public TransactionUtil transactionUtil() {
+        return new TransactionUtil(transactionTemplate());
+    }
+
+    public StudentService studentService() {
+        return new StudentService(
+                transactionUtil(),
+                validatorUtil(),
+                studentRepository()
+        );
+    }
+
+    public GroupService groupService() {
+        return new GroupService(
+                transactionUtil(),
+                validatorUtil(),
+                groupRepository()
+        );
     }
 }
