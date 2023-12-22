@@ -31,7 +31,8 @@ class GroupRepositoryImplTest {
                 return null;
             } catch(Throwable e) {
                 status.setRollbackOnly();
-                throw new RuntimeException(e);
+                if(e instanceof RuntimeException) throw (RuntimeException)e;
+                else throw new RuntimeException(e);
             }
         });
     }
@@ -54,9 +55,9 @@ class GroupRepositoryImplTest {
     @Test
     void add1() {
         Group group = new Group().setName("new Group");
-        commit(() -> groupRepository.add(group));
 
-        Group actual = groupRepository.getById(group.getId());
+        commit(() -> groupRepository.add(group));
+        Group actual = groupRepository.tryGetById(group.getId());
 
         Assertions.assertThat(actual)
                 .usingRecursiveComparison()
@@ -70,7 +71,7 @@ class GroupRepositoryImplTest {
 
         Group duplicate = new Group().setName("new Group");
 
-        Assertions.assertThatThrownBy(() -> groupRepository.add(duplicate))
+        Assertions.assertThatThrownBy(() -> commit(() -> groupRepository.add(duplicate)))
                 .isInstanceOf(DuplicateGroupException.class);
     }
 

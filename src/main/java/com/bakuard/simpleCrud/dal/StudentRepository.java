@@ -4,9 +4,11 @@ import com.bakuard.simpleCrud.model.Student;
 
 public interface StudentRepository {
 
-    public Page<Student> getAll(int pageNumber, int pageSize);
-
     public Student add(Student newStudent);
 
-    public void deleteById(long id);
+    public Page<Student> getAll(int pageNumber, int pageSize);
+
+    public Student tryGetById(long id);
+
+    public void tryDeleteById(long id);
 }

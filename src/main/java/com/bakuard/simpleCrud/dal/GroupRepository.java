@@ -8,5 +8,5 @@ public interface GroupRepository {
 
     public Page<Group> getAll(int pageNumber, int pageSize);
 
-    public Group getById(long id);
+    public Group tryGetById(long id);
 }
