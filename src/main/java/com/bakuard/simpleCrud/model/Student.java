@@ -1,16 +1,25 @@
 package com.bakuard.simpleCrud.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+
 import java.time.LocalDate;
 
 public class Student {
 
     private long id;
     //Имя
+    @NotBlank(message = "Student first name must contains at least one non-whitespace character")
     private String firstName;
     //Фамилия
+    @NotBlank(message = "Student second name must contains at least one non-whitespace character")
     private String secondName;
     //Отчество
+    @NotBlank(message = "Student middle name must contains at least one non-whitespace character")
     private String middleName;
+    @NotNull
+    @PastOrPresent(message = "Student birthday must be past or present")
     private LocalDate birthday;
     private Group group;
 

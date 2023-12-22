@@ -1,8 +1,11 @@
 package com.bakuard.simpleCrud.model;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class Group {
 
     private long id;
+    @NotBlank(message = "Group name must contains at least one non-whitespace character")
     private String name;
 
     public Group() {}
