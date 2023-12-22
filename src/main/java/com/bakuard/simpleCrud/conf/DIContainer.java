@@ -1,6 +1,8 @@
 package com.bakuard.simpleCrud.conf;
 
+import com.bakuard.simpleCrud.dal.GroupRepository;
 import com.bakuard.simpleCrud.dal.StudentRepository;
+import com.bakuard.simpleCrud.dal.impl.GroupRepositoryImpl;
 import com.bakuard.simpleCrud.dal.impl.StudentRepositoryImpl;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -36,10 +38,6 @@ public class DIContainer {
         });
     }
 
-    public StudentRepository studentRepository(DataSource dataSource) {
-        return new StudentRepositoryImpl(dataSource);
-    }
-
     public PlatformTransactionManager transactionManager() {
         return (PlatformTransactionManager) singletons.computeIfAbsent("transactionManager",
                 key -> new DataSourceTransactionManager(dataSource())
@@ -48,5 +46,15 @@ public class DIContainer {
 
     public TransactionTemplate transactionTemplate() {
         return new TransactionTemplate(transactionManager());
+    }
+
+    public StudentRepository studentRepository(DataSource dataSource) {
+        return (StudentRepository) singletons.computeIfAbsent("studentRepository",
+                key -> new StudentRepositoryImpl(dataSource));
+    }
+
+    public GroupRepository groupRepository(DataSource dataSource) {
+        return (GroupRepository) singletons.computeIfAbsent("groupRepository",
+                key -> new GroupRepositoryImpl(dataSource));
     }
 }

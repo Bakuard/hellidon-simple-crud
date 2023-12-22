@@ -27,8 +27,8 @@ public class StudentRepositoryImpl implements StudentRepository {
 
     @Override
     public Page<Student> getAll(int pageNumber, int pageSize) {
-        int totalStudents = getTotalStudents();
-        PageMeta pageMeta = new PageMeta(pageSize, pageNumber, totalStudents);
+        int totalNumber = getTotalNumberOfStudents();
+        PageMeta pageMeta = new PageMeta(pageSize, pageNumber, totalNumber);
 
         List<Student> students = jdbcClient.sql("""
                 SELECT students.student_id,
@@ -36,7 +36,7 @@ public class StudentRepositoryImpl implements StudentRepository {
                        students.second_name,
                        students.middle_name,
                        students.birthday,
-                       groups.group_id
+                       groups.group_id,
                        groups.name
                     FROM students
                     INNER JOIN groups ON students.group_id = groups.group_id
@@ -84,14 +84,14 @@ public class StudentRepositoryImpl implements StudentRepository {
                     .update(keyHolder);
             newStudent.setId(keyHolder.getKeyAs(Long.class));
             return newStudent;
-        } catch(DuplicateKeyException exception) {
+        } catch(DuplicateKeyException e) {
             throw new DuplicateUserException(
-                    "User with such id first, last or middle name already exists.");
+                    "User with such id, first, last or middle name already exists.", e);
         } catch(DataIntegrityViolationException e) {
             Group group = newStudent.getGroup();
             throw new UnknownGroupException(
                     "Unknown group with name=%s and id=%d"
-                            .formatted(group.getName(), group.getId()));
+                            .formatted(group.getName(), group.getId()), e);
         }
     }
 
@@ -101,8 +101,8 @@ public class StudentRepositoryImpl implements StudentRepository {
     }
 
 
-    private int getTotalStudents() {
-        return (int) jdbcClient.sql("SELECT Count(*) FROM students;")
+    private int getTotalNumberOfStudents() {
+        return (int) jdbcClient.sql("SELECT Count(*) AS totalNumber FROM students;")
                 .query()
                 .singleValue();
     }
