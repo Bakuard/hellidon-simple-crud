@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.util.List;
 
@@ -18,8 +17,8 @@ public class GroupRepositoryImpl implements GroupRepository {
 
     private final JdbcClient jdbcClient;
 
-    public GroupRepositoryImpl(DataSource dataSource) {
-        this.jdbcClient = JdbcClient.create(dataSource);
+    public GroupRepositoryImpl(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
     }
 
     @Override
@@ -41,17 +40,17 @@ public class GroupRepositoryImpl implements GroupRepository {
 
     @Override
     public Page<Group> getAll(int pageNumber, int pageSize) {
-        int totalNumber = getTotalNumberOfGroups();
+        long totalNumber = getTotalNumberOfGroups();
         PageMeta pageMeta = new PageMeta(pageSize, pageNumber, totalNumber);
 
         List<Group> groups = jdbcClient.sql("""
                 SELECT groups.*
                     FROM groups
-                    ORDER BY groups.name
-                    LIMIT :page_number
+                    ORDER BY group_id
+                    LIMIT :page_size
                     OFFSET :offset
                 """)
-                .param("page_number", pageMeta.pageNumber())
+                .param("page_size", pageMeta.pageSize())
                 .param("offset", pageMeta.offset())
                 .query((ResultSet result, int row) ->
                         new Group()
@@ -63,9 +62,21 @@ public class GroupRepositoryImpl implements GroupRepository {
         return new Page<>(pageMeta, groups);
     }
 
+    @Override
+    public Group getById(long id) {
+        return jdbcClient.sql("SELECT * FROM groups WHERE group_id = :id;")
+                .param("id", id)
+                .query((resultSet, rowNumber) ->
+                        new Group()
+                                .setId(resultSet.getLong("group_id"))
+                                .setName(resultSet.getString("name"))
+                )
+                .single();
+    }
 
-    private int getTotalNumberOfGroups() {
-        return (int) jdbcClient.sql("SELECT Count(*) AS totalNumber FROM groups;")
+
+    private long getTotalNumberOfGroups() {
+        return (long) jdbcClient.sql("SELECT Count(*) AS totalNumber FROM groups;")
                 .query()
                 .singleValue();
     }

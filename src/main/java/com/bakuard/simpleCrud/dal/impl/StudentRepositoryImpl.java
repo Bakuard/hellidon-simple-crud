@@ -21,13 +21,13 @@ public class StudentRepositoryImpl implements StudentRepository {
 
     private final JdbcClient jdbcClient;
 
-    public StudentRepositoryImpl(DataSource dataSource) {
-        this.jdbcClient = JdbcClient.create(dataSource);
+    public StudentRepositoryImpl(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
     }
 
     @Override
     public Page<Student> getAll(int pageNumber, int pageSize) {
-        int totalNumber = getTotalNumberOfStudents();
+        long totalNumber = getTotalNumberOfStudents();
         PageMeta pageMeta = new PageMeta(pageSize, pageNumber, totalNumber);
 
         List<Student> students = jdbcClient.sql("""
@@ -41,10 +41,10 @@ public class StudentRepositoryImpl implements StudentRepository {
                     FROM students
                     INNER JOIN groups ON students.group_id = groups.group_id
                     ORDER BY students.first_name, students.second_name
-                    LIMIT :page_number
+                    LIMIT :page_size
                     OFFSET :offset
                 """)
-                .param("page_number", pageMeta.pageNumber())
+                .param("page_size", pageMeta.pageSize())
                 .param("offset", pageMeta.offset())
                 .query((ResultSet result, int row) ->
                         new Student()
@@ -101,8 +101,8 @@ public class StudentRepositoryImpl implements StudentRepository {
     }
 
 
-    private int getTotalNumberOfStudents() {
-        return (int) jdbcClient.sql("SELECT Count(*) AS totalNumber FROM students;")
+    private long getTotalNumberOfStudents() {
+        return (long) jdbcClient.sql("SELECT Count(*) AS totalNumber FROM students;")
                 .query()
                 .singleValue();
     }

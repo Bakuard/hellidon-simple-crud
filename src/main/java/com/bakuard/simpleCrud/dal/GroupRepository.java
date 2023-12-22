@@ -7,4 +7,6 @@ public interface GroupRepository {
     public Group add(Group newGroup);
 
     public Page<Group> getAll(int pageNumber, int pageSize);
+
+    public Group getById(long id);
 }

@@ -6,7 +6,7 @@ CREATE TABLE groups (
 );
 
 CREATE TABLE students (
-    student_id BIGINT NOT NULL,
+    student_id BIGINT AUTO_INCREMENT NOT NULL,
     first_name VARCHAR(64) NOT NULL,
     second_name VARCHAR(64) NOT NULL,
     middle_name VARCHAR(64) NOT NULL,
@@ -14,5 +14,5 @@ CREATE TABLE students (
     group_id BIGINT,
     PRIMARY KEY(student_id),
     UNIQUE(first_name, second_name, middle_name),
-    FOREIGN KEY (group_id) REFERENCES groups(group_id) ON SET NULL
+    FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE SET NULL
 );
