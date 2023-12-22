@@ -1,11 +1,9 @@
 package com.bakuard.simpleCrud.model;
 
-import java.util.Objects;
-
 public class Group {
 
     private long id;
-    private String groupName;
+    private String name;
 
     public Group() {}
 
@@ -18,12 +16,12 @@ public class Group {
         return this;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public String getName() {
+        return name;
     }
 
-    public Group setGroupName(String groupName) {
-        this.groupName = groupName;
+    public Group setName(String name) {
+        this.name = name;
         return this;
     }
 
@@ -44,7 +42,7 @@ public class Group {
     public String toString() {
         return "Group{" +
                 "id=" + id +
-                ", groupName='" + groupName + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 }
