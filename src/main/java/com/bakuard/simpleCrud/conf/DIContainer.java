@@ -4,8 +4,12 @@ import com.bakuard.simpleCrud.dal.GroupRepository;
 import com.bakuard.simpleCrud.dal.StudentRepository;
 import com.bakuard.simpleCrud.dal.impl.GroupRepositoryImpl;
 import com.bakuard.simpleCrud.dal.impl.StudentRepositoryImpl;
+import com.bakuard.simpleCrud.service.ValidatorUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.flywaydb.core.Flyway;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -80,5 +84,13 @@ public class DIContainer {
         JdbcClient jdbcClient = jdbcClient();
         return (GroupRepository) singletons.computeIfAbsent("groupRepository",
                 key -> new GroupRepositoryImpl(jdbcClient));
+    }
+
+    public ValidatorUtil validatorUtil() {
+        return (ValidatorUtil) singletons.computeIfAbsent("validatorUtil", key -> {
+            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+            Validator validator = factory.getValidator();
+            return new ValidatorUtil(validator);
+        });
     }
 }
