@@ -1,6 +1,5 @@
 package com.bakuard.simpleCrud.dto;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 public class StudentListItemResponse {
@@ -12,7 +11,7 @@ public class StudentListItemResponse {
     private String secondName;
     //Отчество
     private String middleName;
-    private LocalDate birthday;
+    private String birthday;
     private GroupResponse group;
 
     public StudentListItemResponse() {}
@@ -53,11 +52,11 @@ public class StudentListItemResponse {
         return this;
     }
 
-    public LocalDate getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public StudentListItemResponse setBirthday(LocalDate birthday) {
+    public StudentListItemResponse setBirthday(String birthday) {
         this.birthday = birthday;
         return this;
     }
