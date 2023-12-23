@@ -4,12 +4,15 @@ import com.bakuard.simpleCrud.dal.GroupRepository;
 import com.bakuard.simpleCrud.dal.StudentRepository;
 import com.bakuard.simpleCrud.dal.impl.GroupRepositoryImpl;
 import com.bakuard.simpleCrud.dal.impl.StudentRepositoryImpl;
+import com.bakuard.simpleCrud.exception.ApplicationConfigNotFound;
 import com.bakuard.simpleCrud.service.GroupService;
 import com.bakuard.simpleCrud.service.StudentService;
 import com.bakuard.simpleCrud.service.TransactionUtil;
 import com.bakuard.simpleCrud.service.ValidatorUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.helidon.openapi.OpenApiFeature;
+import io.helidon.webserver.WebServer;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -31,12 +34,18 @@ public class DIContainer {
     private final Properties properties;
     private final Map<String, Object> singletons;
 
-    public DIContainer(String relativePathToPropertiesFile) throws IOException {
-        InputStream inputStream = getClass()
-                .getClassLoader()
-                .getResourceAsStream(relativePathToPropertiesFile);
+    public DIContainer(String relativePathToPropertiesFile) {
         Properties properties = new Properties();
-        properties.load(inputStream);
+
+        try {
+            InputStream inputStream = getClass()
+                    .getClassLoader()
+                    .getResourceAsStream(relativePathToPropertiesFile);
+            properties.load(inputStream);
+        } catch(IOException e) {
+            throw new ApplicationConfigNotFound(
+                    "Fail to load application config file by path: " + relativePathToPropertiesFile, e);
+        }
 
         this.properties = properties;
         this.singletons = new HashMap<>();
@@ -115,5 +124,20 @@ public class DIContainer {
                 validatorUtil(),
                 groupRepository()
         );
+    }
+
+    public WebServer webServer() {
+        return WebServer.builder()
+                .host("localhost")
+                .port(8080)
+                .addFeature(OpenApiFeature.builder()
+                        .webContext("/api")
+                        .build())
+                .routing(routing ->
+                        routing.error(RuntimeException.class, (req, res, ex) -> {
+                                    res.status(400).send(ex.getMessage());
+                                })
+                )
+                .build();
     }
 }
