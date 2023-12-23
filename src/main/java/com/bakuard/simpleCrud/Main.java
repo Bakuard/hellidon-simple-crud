@@ -1,9 +1,12 @@
 package com.bakuard.simpleCrud;
 
+import com.bakuard.simpleCrud.conf.DIContainer;
+
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        DIContainer diContainer = new DIContainer("application.properties");
+        diContainer.webServer().start();
     }
 
 }
