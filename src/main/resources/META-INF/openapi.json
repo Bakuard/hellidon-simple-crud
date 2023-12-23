@@ -8,7 +8,7 @@
   "paths": {
     "/groups/new": {
       "post": {
-        "tags": ["Группы студентов"],
+        "tags": ["Группы"],
         "summary": "Добавляет новую группу",
         "requestBody": {
           "description": "Данные новой группы",
@@ -32,7 +32,7 @@
               }
             }
           },
-          "404": {
+          "400": {
             "description": "Наименование группы не уникально",
             "content": {
               "application/json": {
@@ -47,9 +47,9 @@
     },
     "/groups/{id}": {
       "get": {
-        "tags": ["Группы студентов"],
+        "tags": ["Группы"],
         "summary": "Возвращает группу по её идентификатору",
-        "description": "Возвращает подробные данные группы поп её id. Если группы с таким id не существует - возвращает ошибку.",
+        "description": "Возвращает подробные данные группы по её id. Если группы с таким id не существует - возвращает ошибку.",
         "parameters": [
           {
             "name": "id",
@@ -86,9 +86,9 @@
     },
     "/groups": {
       "get": {
-        "tags": ["Группы студентов"],
+        "tags": ["Группы"],
         "summary": "Возвращает неколько групп",
-        "description": "Возвращает неколько групп студентов отсортирвоанных по id.",
+        "description": "Возвращает неколько групп отсортированных по id.",
         "parameters": [
           {
             "description": "Принимает целые значения от 0 и выше",
@@ -111,7 +111,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Выборка из групп студентов отсротированных по id",
+            "description": "Выборка из групп отсортированных по id",
             "content": {
               "application/json": {
                 "schema": {
@@ -122,11 +122,193 @@
           }
         }
       }
+    },
+    "/students/new": {
+      "post": {
+        "tags": ["Студенты"],
+        "summary": "Добавляет нового студента",
+        "requestBody": {
+          "description": "Данные нового студента",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/newStudentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Студент успешно добавлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/studentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Комбинация имени, фамилии и отчества студента не уникальна.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/studnets/{id}": {
+      "get": {
+        "tags": ["Студенты"],
+        "summary": "Возвращает студента по его идентификатору",
+        "description": "Возвращает подробные данные студента по его id. Если студента с таким id не существует - возвращает ошибку.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Учетные данные корректны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/newStudentRequest"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Не удалось найти студента с указанным id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students": {
+      "get": {
+        "tags": ["Студенты"],
+        "summary": "Возвращает неколько студентов",
+        "description": "Возвращает неколько студентов отсортированных по id.",
+        "parameters": [
+          {
+            "description": "Принимает целые значения от 0 и выше",
+            "name": "pageNumber",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "description": "Принимает целые значения от 1 и выше",
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Выборка из студентов отсортированных по id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/studentsPageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/delete/{id}": {
+      "delete": {
+        "tags": ["Студенты"],
+        "summary": "Удаляет студента",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Студент успешно удален",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Не удалось найти студента с указанным id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "pageMetaResponse": {
+        "description": "Метаданные страницы, такие как номер, размер, и т.д. Также сюда входят данные об искомой выборке, например: общее кол-во элементов выборки, общее кол-во страниц, на которую эту выборку можно разбить и т.д.",
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "description": "Размер страницы заданный при запросе",
+            "type": "number"
+          },
+          "pageNumber": {
+            "description": "Номер страницы",
+            "type": "number"
+          },
+          "totalItems": {
+            "description": "Общее кол-во элементов искомой выборки",
+            "type": "number"
+          },
+          "totalPages": {
+            "description": "Общее кол-во страниц, на которую можно разбить искомую выборку. Рассчитывается с учетом задаваемого размера страницы.",
+            "type": "number"
+          },
+          "lastPageNumber": {
+            "description": "Номер последней страницы в искомой выборке.",
+            "type": "number"
+          }
+        }
+      },
       "errorResponse": {
+        "description": "Общий формат для всех ошибок отправляемых сервисом.",
         "type": "object",
         "properties": {
           "timestamp": {
@@ -143,7 +325,9 @@
         }
       },
       "newGroupRequest": {
+        "description": "Данные новой добавляемой группы",
         "type": "object",
+        "required": ["name"],
         "properties": {
           "name": {
             "type": "string",
@@ -152,6 +336,7 @@
         }
       },
       "groupResponse": {
+        "description": "Возвращаемые данные об одной конкретной группе",
         "type": "object",
         "properties": {
           "id": {
@@ -165,18 +350,95 @@
         }
       },
       "groupsPageResponse": {
+        "description": "Возвращаемая выборка из всех групп отсортированных по идентификатору.",
         "type": "object",
         "properties": {
           "meta": {
-            "type": "object",
-            "properties": {
-              "pageSize": { "type": "number" },
-              "pageNumber": { "type": "number" },
-              "totalItems": { "type": "number" },
-              "totalPages": { "type": "number" },
-              "lastPageNumber": { "type": "number" },
-              "isEmpty": { "type": "boolean" }
+            "$ref": "#/components/schemas/pageMetaResponse"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "$ref": "#/components/schemas/groupResponse"
             }
+          }
+        }
+      },
+      "newStudentRequest": {
+        "description": "Данные нового добавляемого студента",
+        "type": "object",
+        "required": ["firstName", "secondName", "middleName", "birthday"],
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "Имя"
+          },
+          "secondName": {
+            "type": "string",
+            "description": "Фамилия"
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Отчество"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Дата рождения"
+          },
+          "groupId": {
+            "type": "number",
+            "description": "Идентификатор группы, в которой учится студент"
+          }
+        }
+      },
+      "deleteStudentRequest": {
+        "description": "Данные идентифицирующие удаляемого студента",
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Идентификатор студента"
+          }
+        }
+      },
+      "studentResponse": {
+        "description": "Возвращаемые данные об одном конкретном студенте.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Идентификатор студента"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Имя"
+          },
+          "secondName": {
+            "type": "string",
+            "description": "Фамилия"
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Отчество"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Год рождения"
+          },
+          "group": {
+            "$ref": "#/components/schemas/groupResponse"
+          }
+        }
+      },
+      "studentsPageResponse": {
+        "description": "Возвращаемая выборка из всех студентов отсортированных по идентификатору.",
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/pageMetaResponse"
           },
           "data": {
             "type": "array",

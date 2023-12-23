@@ -24,10 +24,10 @@ public interface ResultMapper {
     GroupResponse toGroupResponse(Group group);
 
     @Mapping(target = "birthday", expression = "java(student.getBirthday().toString())")
-    StudentListItemResponse toStudentListItemResponse(Student student);
+    StudentResponse toStudentResponse(Student student);
 
-    default Page<StudentListItemResponse> toStudentsListItemResponse(Page<Student> page) {
-        return page.map(this::toStudentListItemResponse);
+    default Page<StudentResponse> toStudentsResponse(Page<Student> page) {
+        return page.map(this::toStudentResponse);
     }
 
     default Page<GroupResponse> toGroupsResponse(Page<Group> page) {

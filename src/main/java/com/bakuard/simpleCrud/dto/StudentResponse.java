@@ -2,7 +2,7 @@ package com.bakuard.simpleCrud.dto;
 
 import java.util.Objects;
 
-public class StudentListItemResponse {
+public class StudentResponse {
 
     private long id;
     //Имя
@@ -14,13 +14,13 @@ public class StudentListItemResponse {
     private String birthday;
     private GroupResponse group;
 
-    public StudentListItemResponse() {}
+    public StudentResponse() {}
 
     public long getId() {
         return id;
     }
 
-    public StudentListItemResponse setId(long id) {
+    public StudentResponse setId(long id) {
         this.id = id;
         return this;
     }
@@ -29,7 +29,7 @@ public class StudentListItemResponse {
         return firstName;
     }
 
-    public StudentListItemResponse setFirstName(String firstName) {
+    public StudentResponse setFirstName(String firstName) {
         this.firstName = firstName;
         return this;
     }
@@ -38,7 +38,7 @@ public class StudentListItemResponse {
         return secondName;
     }
 
-    public StudentListItemResponse setSecondName(String secondName) {
+    public StudentResponse setSecondName(String secondName) {
         this.secondName = secondName;
         return this;
     }
@@ -47,7 +47,7 @@ public class StudentListItemResponse {
         return middleName;
     }
 
-    public StudentListItemResponse setMiddleName(String middleName) {
+    public StudentResponse setMiddleName(String middleName) {
         this.middleName = middleName;
         return this;
     }
@@ -56,7 +56,7 @@ public class StudentListItemResponse {
         return birthday;
     }
 
-    public StudentListItemResponse setBirthday(String birthday) {
+    public StudentResponse setBirthday(String birthday) {
         this.birthday = birthday;
         return this;
     }
@@ -65,7 +65,7 @@ public class StudentListItemResponse {
         return group;
     }
 
-    public StudentListItemResponse setGroup(GroupResponse group) {
+    public StudentResponse setGroup(GroupResponse group) {
         this.group = group;
         return this;
     }
@@ -74,7 +74,7 @@ public class StudentListItemResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StudentListItemResponse that = (StudentListItemResponse) o;
+        StudentResponse that = (StudentResponse) o;
         return id == that.id &&
                 Objects.equals(firstName, that.firstName) &&
                 Objects.equals(secondName, that.secondName) &&
