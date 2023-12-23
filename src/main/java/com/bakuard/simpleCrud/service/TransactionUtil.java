@@ -4,6 +4,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.function.Supplier;
 
+/**
+ * Простая обертка на TransactionTemplate упрощающая его использование.
+ */
 public class TransactionUtil {
 
     public static interface Executable {

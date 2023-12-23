@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Итоговый результат применения пагинации.
+ * @param meta метаданные страницы (см. {@link PageMeta}).
+ * @param data полезные данные содержащиеся в данной странице.
+ */
 public record Page<T>(PageMeta meta, List<T> data) {
 
     public Stream<T> stream() {
