@@ -1,6 +1,6 @@
 package com.bakuard.simpleCrud.exception;
 
-public class UnknownGroupException extends RuntimeException {
+public class UnknownGroupException extends UnknownEntityException {
 
     public UnknownGroupException() {
     }

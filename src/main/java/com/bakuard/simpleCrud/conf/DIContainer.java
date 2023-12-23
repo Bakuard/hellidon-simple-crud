@@ -1,5 +1,6 @@
 package com.bakuard.simpleCrud.conf;
 
+import com.bakuard.simpleCrud.controller.ErrorController;
 import com.bakuard.simpleCrud.controller.GroupController;
 import com.bakuard.simpleCrud.controller.StudentController;
 import com.bakuard.simpleCrud.dal.GroupRepository;
@@ -27,6 +28,8 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.flywaydb.core.Flyway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -40,6 +43,8 @@ import java.util.Map;
 import java.util.Properties;
 
 public class DIContainer {
+
+    private static final Logger logger = LoggerFactory.getLogger(DIContainer.class.getName());
 
     private final Properties properties;
     private final Map<String, Object> singletons;
@@ -60,6 +65,17 @@ public class DIContainer {
         this.properties = properties;
         this.singletons = new HashMap<>();
     }
+
+    public void startContainer() {
+        try {
+            flyway().migrate();
+            webServer().start();
+        } catch(RuntimeException e) {
+            logger.error("Fail to start application", e);
+            throw e;
+        }
+    }
+
 
     public HikariDataSource dataSource() {
         return (HikariDataSource) singletons.computeIfAbsent("dataSource", key -> {
@@ -177,6 +193,10 @@ public class DIContainer {
         return new GroupController(groupService());
     }
 
+    public ErrorController errorController() {
+        return new ErrorController();
+    }
+
     public WebServer webServer() {
         return WebServer.builder()
                 .host("localhost")
@@ -188,10 +208,7 @@ public class DIContainer {
                 .routing(routing ->
                         routing.register("/groups", groupController())
                                 .register("/students", studentController())
-                                .error(RuntimeException.class, (req, res, ex) -> {
-                                    System.out.println(ex);
-                                    res.status(400).send(ex.getMessage());
-                                })
+                                .error(Throwable.class, errorController())
                 )
                 .mediaContext(MediaContext.builder()
                         .mediaSupportsDiscoverServices(false)

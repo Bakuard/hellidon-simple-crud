@@ -1,6 +1,6 @@
 package com.bakuard.simpleCrud.exception;
 
-public class ApplicationConfigNotFound extends RuntimeException {
+public class ApplicationConfigNotFound extends DomainException {
 
     public ApplicationConfigNotFound() {
     }
