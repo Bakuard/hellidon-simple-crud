@@ -42,6 +42,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Данный класс отвечает за разрешение зависимостей между всеми другими классами приложения.
+ * Также предоставляет метод {@link #startContainer()} для запуска приложения.
+ */
 public class DIContainer {
 
     private static final Logger logger = LoggerFactory.getLogger(DIContainer.class.getName());
@@ -49,6 +53,12 @@ public class DIContainer {
     private final Properties properties;
     private final Map<String, Object> singletons;
 
+    /**
+     * Создает новый {@link DIContainer}. Не создавайте более одного контейнера для работы приложения.
+     * @param relativePathToPropertiesFile путь к файлу properties с конфигурацией основных модулей
+     *                                     приложений. Путь следует указывать относительно корня
+     *                                     classpath.
+     */
     public DIContainer(String relativePathToPropertiesFile) {
         Properties properties = new Properties();
 
@@ -66,6 +76,9 @@ public class DIContainer {
         this.singletons = new HashMap<>();
     }
 
+    /**
+     * Создает все необходимые объекты для работы приложения, а затем запускает его.
+     */
     public void startContainer() {
         try {
             flyway().migrate();
@@ -199,8 +212,8 @@ public class DIContainer {
 
     public WebServer webServer() {
         return WebServer.builder()
-                .host("localhost")
-                .port(8080)
+                .host(properties.getProperty("app.webServer.host"))
+                .port(Integer.parseInt(properties.getProperty("app.webServer.port")))
                 .addFeature(OpenApiFeature.builder()
                         .webContext("/api")
                         .name("/Students Service")

@@ -6,6 +6,10 @@ import jakarta.validation.Validator;
 
 import java.util.Set;
 
+/**
+ * Простая обертка над стандартным валидатором akarta.validation.Validator. Предоставляет метод
+ * проверки выбрасывающий исключение с подробными данными результатов валидации.
+ */
 public class ValidatorUtil {
 
     private final Validator validator;

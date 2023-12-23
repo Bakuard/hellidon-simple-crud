@@ -9,6 +9,10 @@ import io.helidon.webserver.http.ServerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Перехватывает все ошибки возникшие в других контролерах, логирует их и возвращает пользователю
+ * сообщение с подробной информацией об ошибке.
+ */
 public class ErrorController implements ErrorHandler<Throwable> {
 
     private static final Logger logger = LoggerFactory.getLogger(ErrorController.class.getName());
