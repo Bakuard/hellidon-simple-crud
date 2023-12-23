@@ -1,6 +1,7 @@
 package com.bakuard.simpleCrud.conf;
 
 import com.bakuard.simpleCrud.controller.GroupController;
+import com.bakuard.simpleCrud.controller.StudentController;
 import com.bakuard.simpleCrud.dal.GroupRepository;
 import com.bakuard.simpleCrud.dal.PageMeta;
 import com.bakuard.simpleCrud.dal.StudentRepository;
@@ -168,6 +169,10 @@ public class DIContainer {
                 );
     }
 
+    public StudentController studentController() {
+        return new StudentController(studentService(), groupService());
+    }
+
     public GroupController groupController() {
         return new GroupController(groupService());
     }
@@ -182,6 +187,7 @@ public class DIContainer {
                         .build())
                 .routing(routing ->
                         routing.register("/groups", groupController())
+                                .register("/students", studentController())
                                 .error(RuntimeException.class, (req, res, ex) -> {
                                     System.out.println(ex);
                                     res.status(400).send(ex.getMessage());

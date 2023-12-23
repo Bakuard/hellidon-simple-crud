@@ -41,13 +41,13 @@ public class StudentRepositoryImpl implements StudentRepository {
                     .param("second_name", newStudent.getSecondName())
                     .param("middle_name", newStudent.getMiddleName())
                     .param("birthday", newStudent.getBirthday())
-                    .param("group_id", newStudent.getGroup().getId())
+                    .param("group_id", newStudent.getGroup() != null ? newStudent.getGroup().getId() : null)
                     .update(keyHolder);
             newStudent.setId(keyHolder.getKeyAs(Long.class));
             return newStudent;
         } catch(DuplicateKeyException e) {
             throw new DuplicateStudentException(
-                    "User with id=%d, firstName=%s, secondName=%s or middleName=%s already exists."
+                    "User with id=%d, firstName=%s, secondName=%s and middleName=%s already exists."
                             .formatted(newStudent.getId(),
                                     newStudent.getFirstName(),
                                     newStudent.getSecondName(),
@@ -76,26 +76,31 @@ public class StudentRepositoryImpl implements StudentRepository {
                        groups.group_id,
                        groups.name
                     FROM students
-                    INNER JOIN groups ON students.group_id = groups.group_id
+                    LEFT OUTER JOIN groups ON students.group_id = groups.group_id
                     ORDER BY students.student_id
                     LIMIT :page_size
-                    OFFSET :offset
+                    OFFSET :offset;
                 """)
                 .param("page_size", pageMeta.pageSize())
                 .param("offset", pageMeta.offset())
-                .query((ResultSet result, int row) ->
-                        new Student()
-                                .setId(result.getLong(1))
-                                .setFirstName(result.getString(2))
-                                .setSecondName(result.getString(3))
-                                .setMiddleName(result.getString(4))
-                                .setBirthday(result.getDate(5).toLocalDate())
-                                .setGroup(
-                                        new Group()
-                                                .setId(result.getLong(6))
-                                                .setName(result.getString(7))
-                                )
-                )
+                .query((ResultSet result, int row) -> {
+                    Student student = new Student()
+                            .setId(result.getLong(1))
+                            .setFirstName(result.getString(2))
+                            .setSecondName(result.getString(3))
+                            .setMiddleName(result.getString(4))
+                            .setBirthday(result.getDate(5).toLocalDate());
+
+                    long groupId = result.getLong(6);
+                    if(!result.wasNull()) {
+                        student.setGroup(
+                                new Group()
+                                        .setId(groupId)
+                                        .setName(result.getString(7))
+                        );
+                    }
+                    return student;
+                })
                 .list();
 
         return new Page<>(pageMeta, students);
@@ -112,23 +117,28 @@ public class StudentRepositoryImpl implements StudentRepository {
                        groups.group_id,
                        groups.name
                     FROM students
-                    INNER JOIN groups ON students.group_id = groups.group_id
+                    LEFT OUTER JOIN groups ON students.group_id = groups.group_id
                     WHERE students.student_id = :id
                 """)
                 .param("id", id)
-                .query((result, rowNumber) ->
-                        new Student()
-                                .setId(result.getLong(1))
-                                .setFirstName(result.getString(2))
-                                .setSecondName(result.getString(3))
-                                .setMiddleName(result.getString(4))
-                                .setBirthday(result.getDate(5).toLocalDate())
-                                .setGroup(
-                                        new Group()
-                                                .setId(result.getLong(6))
-                                                .setName(result.getString(7))
-                                )
-                )
+                .query((result, rowNumber) -> {
+                    Student student = new Student()
+                            .setId(result.getLong(1))
+                            .setFirstName(result.getString(2))
+                            .setSecondName(result.getString(3))
+                            .setMiddleName(result.getString(4))
+                            .setBirthday(result.getDate(5).toLocalDate());
+
+                    long groupId = result.getLong(6);
+                    if(!result.wasNull()) {
+                        student.setGroup(
+                                new Group()
+                                        .setId(groupId)
+                                        .setName(result.getString(7))
+                        );
+                    }
+                    return student;
+                })
                 .optional()
                 .orElseThrow(() -> new UnknownStudentException("Unknown student with id=" + id));
     }

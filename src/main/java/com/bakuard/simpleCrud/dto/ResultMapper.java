@@ -15,7 +15,8 @@ public interface ResultMapper {
 
     ResultMapper INSTANCE = Mappers.getMapper(ResultMapper.class);
 
-    @Mapping(target = "group", expression = "java(groupMapper.apply(request.getGroupId()))")
+    @Mapping(target = "group",
+            expression = "java(request.getGroupId() != null ? groupMapper.apply(request.getGroupId()) : null)")
     @Mapping(target = "birthday", expression = "java(LocalDate.parse(request.getBirthday()))")
     Student toStudent(NewStudentRequest request, Function<Long, Group> groupMapper);
 

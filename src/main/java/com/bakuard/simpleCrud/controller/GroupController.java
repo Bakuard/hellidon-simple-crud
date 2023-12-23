@@ -42,9 +42,9 @@ public class GroupController implements HttpService {
         );
 
         Group group = groupService.tryGetById(groupId);
-        GroupResponse responseContent = ResultMapper.INSTANCE.toGroupResponse(group);
+        GroupResponse groupResponse = ResultMapper.INSTANCE.toGroupResponse(group);
 
-        response.status(200).send(responseContent);
+        response.status(200).send(groupResponse);
     }
 
     private void getAll(ServerRequest request, ServerResponse response) {
