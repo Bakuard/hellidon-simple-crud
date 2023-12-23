@@ -1,6 +1,6 @@
 package com.bakuard.simpleCrud.exception;
 
-public class DuplicateGroupException extends RuntimeException {
+public class DuplicateGroupException extends DomainException {
 
     public DuplicateGroupException() {
     }

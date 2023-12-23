@@ -1,0 +1,47 @@
+<configuration>
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
+    <contextName>Hello-Helidon-Nima</contextName>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{"HH:mm:ss,SSS"} [%level] [%logger:%method\(\)] [%msg]%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="WORK_FILES" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>./logs/work_log%d{dd-MM-yyyy}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{"HH:mm:ss,SSS"} [%level] [%logger:%method\(\)] [%msg] %ex{short}%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR_FILES" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>./logs/error_log%d{dd-MM-yyyy}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{"HH:mm:ss,SSS"} [%level] [%logger:%method\(\)] [%msg] %n%ex{full}%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.bakuard.simpleCrud" level="DEBUG" additivity="true">
+        <appender-ref ref="ERROR_FILES"/>
+        <appender-ref ref="WORK_FILES"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <shutdownHook/>
+</configuration>

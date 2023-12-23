@@ -1,6 +1,6 @@
 package com.bakuard.simpleCrud.exception;
 
-public class DuplicateStudentException extends RuntimeException {
+public class DuplicateStudentException extends DomainException {
 
     public DuplicateStudentException() {
     }

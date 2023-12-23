@@ -1,6 +1,6 @@
 package com.bakuard.simpleCrud.exception;
 
-public class UnknownStudentException extends RuntimeException {
+public class UnknownStudentException extends UnknownEntityException {
 
     public UnknownStudentException() {
     }
