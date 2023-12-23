@@ -20,4 +20,8 @@ public record PageMeta(long pageSize, long pageNumber, long totalItems) {
     public long offset() {
         return pageNumber * pageSize;
     }
+
+    public boolean isEmpty() {
+        return totalItems == 0;
+    }
 }

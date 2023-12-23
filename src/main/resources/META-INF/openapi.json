@@ -6,34 +6,34 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/users/enter": {
+    "/groups/new": {
       "post": {
-        "tags": ["Учетные данные пользователей"],
-        "summary": "Выполняет вход для указанного пользователя и возвращает JWS в случае успеха",
+        "tags": ["Группы студентов"],
+        "summary": "Добавляет новую группу",
         "requestBody": {
-          "description": "Учетные данные пользователя - логин и пароль",
+          "description": "Данные новой группы",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/cridentialForEnterRequest"
+                "$ref": "#/components/schemas/newGroupRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Учетные данные корректны",
+            "description": "Группа успешно добавлена",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jwsResponse"
+                  "$ref": "#/components/schemas/newGroupRequest"
                 }
               }
             }
           },
-          "403": {
-            "description": "В учетных данных допущена ошибка",
+          "404": {
+            "description": "Наименование группы не уникально",
             "content": {
               "application/json": {
                 "schema": {
@@ -45,101 +45,34 @@
         }
       }
     },
-    "/users/registration/firstStep": {
-      "post": {
-        "tags": ["Учетные данные пользователей"],
-        "summary": "Выполняет вход для указанного пользователя и возвращает JWS в случае успеха",
-        "description": "Первый из двух шагов регистраци нового пользователя через почту. Метод принимает учетные данные нового пользователя, проверяет их корректность и отправляет письмо с подтверждением на указанную почту.",
-        "parameters": [],
-        "requestBody": {
-          "description": "Учетные данные нового пользователя - логин, пароль и почта",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/cridentialForRegistrationRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Учетные данные корректны",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "Confirmation email sent to email"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "В учетных данных допущена ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/errorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/users/registration/finalStep": {
-      "post": {
-        "tags": ["Учетные данные пользователей"],
-        "summary": "Завершающий шаг регистрации нового пользователя через почту",
-        "description": "Второй и завершающий шаг регистраци нового пользователя через почту. Метод сохраняет учетные данные пользователя извелченные из JWS токена регистрации, а затем возвращает JWT токен общего доступа.",
-        "security": [{"registrationAuthKey": []}],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Учетные данные корректны",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jwsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Если передан не корректный токен или токен не указан",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/errorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/users/getByJws": {
+    "/groups/id": {
       "get": {
-        "tags": ["Учетные данные пользователей"],
-        "summary": "Возвращает учетные данные пользователя по JWS токену",
-        "description": "",
-        "security": [{"commonAuthKey": []}],
-        "parameters": [],
+        "tags": ["Группы студентов"],
+        "summary": "Возвращает группу по её идентификатору",
+        "description": "Возвращает подробные данные группы поп её id. Если группы с таким id не существует - возвращает ошибку.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Учетные данные корректны",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/userResponse"
+                  "$ref": "#/components/schemas/newGroupRequest"
                 }
               }
             }
           },
-          "401": {
-            "description": "Если передан не корректный токен или токен не указан",
+          "404": {
+            "description": "Не удалось найти группу с указанным id",
             "content": {
               "application/json": {
                 "schema": {
@@ -151,30 +84,38 @@
         }
       }
     },
-    "/game/getJwtForConnection": {
+    "/groups": {
       "get": {
-        "tags": ["Игровой процесс"],
-        "summary": "Возвращает новый токен для подключения к игровому процессу через Websocket",
-        "description": "Возвращает JWT токен для подключения к игровому процессу через Websocket. Передается в запросе ws://serverAddress/game?token=jwt на установление соединения через Websocket.",
-        "security": [{"commonAuthKey": []}],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Переданный токен корректен",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jwsWebsocketConnectionResponse"
-                }
-              }
+        "tags": ["Группы студентов"],
+        "summary": "Возвращает неколько групп",
+        "description": "Возвращает неколько групп студентов отсортирвоанных по id.",
+        "parameters": [
+          {
+            "description": "Принимает целые значения от 0 и выше",
+            "name": "pageNumber",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
             }
           },
-          "401": {
-            "description": "Если передан не корректный токен или токен не указан",
+          {
+            "description": "Принимает целые значения от 1 и выше",
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Выборка из групп студентов отсротированных по id",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/errorResponse"
+                  "$ref": "#/components/schemas/groupsPageResponse"
                 }
               }
             }
@@ -185,44 +126,6 @@
   },
   "components": {
     "schemas": {
-      "jwsWebsocketConnectionResponse": {
-        "type": "object",
-        "properties": {
-          "jws": {
-            "type": "string",
-            "examples": ["token-value"]
-          }
-        }
-      },
-      "jwsResponse": {
-        "type": "object",
-        "properties": {
-          "jws": {
-            "type": "string",
-            "examples": ["token-value"]
-          },
-          "user": {
-            "$ref": "#/components/schemas/userResponse"
-          }
-        }
-      },
-      "userResponse": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string",
-            "examples": ["uuid"]
-          },
-          "login": {
-            "type": "string",
-            "examples": ["login"]
-          },
-          "email": {
-            "type": "string",
-            "examples": ["user@email.com"]
-          }
-        }
-      },
       "errorResponse": {
         "type": "object",
         "properties": {
@@ -230,69 +133,59 @@
             "type": "string",
             "examples": ["yyyy-MM-dd hh:mm:ss.SSS"]
           },
-          "httpStatus": {
-            "type": "string",
-            "examples": ["http status short descrition"]
-          },
           "httpErrorCode": {
             "type": "number",
             "examples": ["400"]
           },
-          "reasons": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "newGroupRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Наименования группы. Имя группы должно быть уникальным."
+          }
+        }
+      },
+      "groupResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "уникальный идентификатор группы"
+          },
+          "name": {
+            "type": "string",
+            "description": "Наименования группы."
+          }
+        }
+      },
+      "groupsPageResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "type": "object",
+            "properties": {
+              "pageSize": { "type": "number" },
+              "pageNumber": { "type": "number" },
+              "totalItems": { "type": "number" },
+              "totalPages": { "type": "number" },
+              "lastPageNumber": { "type": "number" },
+              "isEmpty": { "type": "boolean" }
+            }
+          },
+          "data": {
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string",
-                  "examples": ["string"]
-                }
-              }
+              "$ref": "#/components/schemas/groupResponse"
             }
           }
         }
-      },
-      "cridentialForEnterRequest": {
-        "type": "object",
-        "properties": {
-          "loggin": {
-            "type": "string",
-            "description": "Логин пользователя.\n\nОграничения:\nДолжен содержать как минимум один отображаемый символ.\nКол-во символов должно быть в диапозоне [1, 20].\nДолжен быть уникален среди других пользователей."
-          },
-          "password": {
-            "type": "string",
-            "description": "Пароль пользователя.\n\nОграничения:\nДолжен содержать как минимум один отображаемый символ.\nКол-во символов должно быть в диапозоне [8, 50]."
-          }
-        }
-      },
-      "cridentialForRegistrationRequest": {
-        "type": "object",
-        "properties": {
-          "loggin": {
-            "type": "string",
-            "description": "Логин пользователя.\n\nОграничения:\nДолжен содержать как минимум один отображаемый символ.\nКол-во символов должно быть в диапозоне [1, 20].\nДолжен быть уникален среди других пользователей."
-          },
-          "email": {
-            "type": "string",
-            "description": "Почта пользователя.\n\nОграничения:\nЗадаваемое значение должно представлять корректный аддрес электронной почты.\nУказываемая почта должна существовать."
-          },
-          "password": {
-            "type": "string",
-            "description": "Пароль пользователя.\n\nОграничения:\nДолжен содержать как минимум один отображаемый символ.\nКол-во символов должно быть в диапозоне [8, 50]."
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "commonAuthKey": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      },
-      "registrationAuthKey": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
       }
     }
   }

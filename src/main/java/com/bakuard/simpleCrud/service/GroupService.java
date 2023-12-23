@@ -18,10 +18,10 @@ public class GroupService {
         this.groupRepository = groupRepository;
     }
 
-    public void add(Group newGroup) {
-        transaction.commit(() -> {
+    public Group add(Group newGroup) {
+        return transaction.commit(() -> {
             validator.assertValid(newGroup);
-            groupRepository.add(newGroup);
+            return groupRepository.add(newGroup);
         });
     }
 

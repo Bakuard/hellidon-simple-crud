@@ -19,6 +19,8 @@ public interface ResultMapper {
     @Mapping(target = "birthday", expression = "java(LocalDate.parse(request.getBirthday()))")
     Student toStudent(NewStudentRequest request, Function<Long, Group> groupMapper);
 
+    Group toGroup(NewGroupRequest request);
+
     GroupResponse toGroupResponse(Group group);
 
     @Mapping(target = "birthday", expression = "java(student.getBirthday().toString())")
@@ -26,5 +28,9 @@ public interface ResultMapper {
 
     default Page<StudentListItemResponse> toStudentsListItemResponse(Page<Student> page) {
         return page.map(this::toStudentListItemResponse);
+    }
+
+    default Page<GroupResponse> toGroupsResponse(Page<Group> page) {
+        return page.map(this::toGroupResponse);
     }
 }

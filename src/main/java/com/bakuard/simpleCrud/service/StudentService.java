@@ -18,10 +18,10 @@ public class StudentService {
         this.studentRepository = studentRepository;
     }
 
-    public void add(Student newStudent) {
-        transaction.commit(() -> {
+    public Student add(Student newStudent) {
+        return transaction.commit(() -> {
             validator.assertValid(newStudent);
-            studentRepository.add(newStudent);
+            return studentRepository.add(newStudent);
         });
     }
 
