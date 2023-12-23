@@ -1,83 +1,39 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Crazy Farm",
-    "description": "Official Crazy Farm API",
+    "title": "Students service",
+    "description": "Students service",
     "version": "0.1.0"
   },
   "paths": {
-    "/users/enter": {
+    "/groups/new": {
       "post": {
-        "tags": ["Учетные данные пользователей"],
-        "summary": "Выполняет вход для указанного пользователя и возвращает JWS в случае успеха",
+        "tags": ["Группы"],
+        "summary": "Добавляет новую группу",
         "requestBody": {
-          "description": "Учетные данные пользователя - логин и пароль",
+          "description": "Данные новой группы",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/cridentialForEnterRequest"
+                "$ref": "#/components/schemas/newGroupRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Учетные данные корректны",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/jwsResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "В учетных данных допущена ошибка",
+            "description": "Группа успешно добавлена",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/errorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/users/registration/firstStep": {
-      "post": {
-        "tags": ["Учетные данные пользователей"],
-        "summary": "Выполняет вход для указанного пользователя и возвращает JWS в случае успеха",
-        "description": "Первый из двух шагов регистраци нового пользователя через почту. Метод принимает учетные данные нового пользователя, проверяет их корректность и отправляет письмо с подтверждением на указанную почту.",
-        "parameters": [],
-        "requestBody": {
-          "description": "Учетные данные нового пользователя - логин, пароль и почта",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/cridentialForRegistrationRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Учетные данные корректны",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "Confirmation email sent to email"
-                  ]
+                  "$ref": "#/components/schemas/newGroupRequest"
                 }
               }
             }
           },
           "400": {
-            "description": "В учетных данных допущена ошибка",
+            "description": "Наименование группы не уникально",
             "content": {
               "application/json": {
                 "schema": {
@@ -89,26 +45,112 @@
         }
       }
     },
-    "/users/registration/finalStep": {
+    "/groups/{id}": {
+      "get": {
+        "tags": ["Группы"],
+        "summary": "Возвращает группу по её идентификатору",
+        "description": "Возвращает подробные данные группы по её id. Если группы с таким id не существует - возвращает ошибку.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Учетные данные корректны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/newGroupRequest"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Не удалось найти группу с указанным id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups": {
+      "get": {
+        "tags": ["Группы"],
+        "summary": "Возвращает неколько групп",
+        "description": "Возвращает неколько групп отсортированных по id.",
+        "parameters": [
+          {
+            "description": "Принимает целые значения от 0 и выше",
+            "name": "pageNumber",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "description": "Принимает целые значения от 1 и выше",
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Выборка из групп отсортированных по id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/groupsPageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/new": {
       "post": {
-        "tags": ["Учетные данные пользователей"],
-        "summary": "Завершающий шаг регистрации нового пользователя через почту",
-        "description": "Второй и завершающий шаг регистраци нового пользователя через почту. Метод сохраняет учетные данные пользователя извелченные из JWS токена регистрации, а затем возвращает JWT токен общего доступа.",
-        "security": [{"registrationAuthKey": []}],
-        "parameters": [],
+        "tags": ["Студенты"],
+        "summary": "Добавляет нового студента",
+        "requestBody": {
+          "description": "Данные нового студента",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/newStudentRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "Учетные данные корректны",
+            "description": "Студент успешно добавлен",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jwsResponse"
+                  "$ref": "#/components/schemas/studentResponse"
                 }
               }
             }
           },
-          "401": {
-            "description": "Если передан не корректный токен или токен не указан",
+          "400": {
+            "description": "Комбинация имени, фамилии и отчества студента не уникальна.",
             "content": {
               "application/json": {
                 "schema": {
@@ -120,26 +162,34 @@
         }
       }
     },
-    "/users/getByJws": {
+    "/students/{id}": {
       "get": {
-        "tags": ["Учетные данные пользователей"],
-        "summary": "Возвращает учетные данные пользователя по JWS токену",
-        "description": "",
-        "security": [{"commonAuthKey": []}],
-        "parameters": [],
+        "tags": ["Студенты"],
+        "summary": "Возвращает студента по его идентификатору",
+        "description": "Возвращает подробные данные студента по его id. Если студента с таким id не существует - возвращает ошибку.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Учетные данные корректны",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/userResponse"
+                  "$ref": "#/components/schemas/newStudentRequest"
                 }
               }
             }
           },
-          "401": {
-            "description": "Если передан не корректный токен или токен не указан",
+          "404": {
+            "description": "Не удалось найти студента с указанным id",
             "content": {
               "application/json": {
                 "schema": {
@@ -151,26 +201,72 @@
         }
       }
     },
-    "/game/getJwtForConnection": {
+    "/students": {
       "get": {
-        "tags": ["Игровой процесс"],
-        "summary": "Возвращает новый токен для подключения к игровому процессу через Websocket",
-        "description": "Возвращает JWT токен для подключения к игровому процессу через Websocket. Передается в запросе ws://serverAddress/game?token=jwt на установление соединения через Websocket.",
-        "security": [{"commonAuthKey": []}],
-        "parameters": [],
+        "tags": ["Студенты"],
+        "summary": "Возвращает неколько студентов",
+        "description": "Возвращает неколько студентов отсортированных по id.",
+        "parameters": [
+          {
+            "description": "Принимает целые значения от 0 и выше",
+            "name": "pageNumber",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "description": "Принимает целые значения от 1 и выше",
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Переданный токен корректен",
+            "description": "Выборка из студентов отсортированных по id",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jwsWebsocketConnectionResponse"
+                  "$ref": "#/components/schemas/studentsPageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/delete/{id}": {
+      "delete": {
+        "tags": ["Студенты"],
+        "summary": "Удаляет студента",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Студент успешно удален",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
           },
-          "401": {
-            "description": "Если передан не корректный токен или токен не указан",
+          "404": {
+            "description": "Не удалось найти студента с указанным id",
             "content": {
               "application/json": {
                 "schema": {
@@ -185,114 +281,173 @@
   },
   "components": {
     "schemas": {
-      "jwsWebsocketConnectionResponse": {
+      "pageMetaResponse": {
+        "description": "Метаданные страницы, такие как номер, размер, и т.д. Также сюда входят данные об искомой выборке, например: общее кол-во элементов выборки, общее кол-во страниц, на которую эту выборку можно разбить и т.д.",
         "type": "object",
         "properties": {
-          "jws": {
-            "type": "string",
-            "examples": ["token-value"]
-          }
-        }
-      },
-      "jwsResponse": {
-        "type": "object",
-        "properties": {
-          "jws": {
-            "type": "string",
-            "examples": ["token-value"]
+          "pageSize": {
+            "description": "Размер страницы заданный при запросе",
+            "type": "number"
           },
-          "user": {
-            "$ref": "#/components/schemas/userResponse"
-          }
-        }
-      },
-      "userResponse": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string",
-            "examples": ["uuid"]
+          "pageNumber": {
+            "description": "Номер страницы",
+            "type": "number"
           },
-          "login": {
-            "type": "string",
-            "examples": ["login"]
+          "totalItems": {
+            "description": "Общее кол-во элементов искомой выборки",
+            "type": "number"
           },
-          "email": {
-            "type": "string",
-            "examples": ["user@email.com"]
+          "totalPages": {
+            "description": "Общее кол-во страниц, на которую можно разбить искомую выборку. Рассчитывается с учетом задаваемого размера страницы.",
+            "type": "number"
+          },
+          "lastPageNumber": {
+            "description": "Номер последней страницы в искомой выборке.",
+            "type": "number"
           }
         }
       },
       "errorResponse": {
+        "description": "Общий формат для всех ошибок отправляемых сервисом.",
         "type": "object",
         "properties": {
           "timestamp": {
             "type": "string",
             "examples": ["yyyy-MM-dd hh:mm:ss.SSS"]
           },
-          "httpStatus": {
-            "type": "string",
-            "examples": ["http status short descrition"]
-          },
           "httpErrorCode": {
             "type": "number",
             "examples": ["400"]
           },
-          "reasons": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "newGroupRequest": {
+        "description": "Данные новой добавляемой группы",
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Наименования группы. Имя группы должно быть уникальным."
+          }
+        }
+      },
+      "groupResponse": {
+        "description": "Возвращаемые данные об одной конкретной группе",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "уникальный идентификатор группы"
+          },
+          "name": {
+            "type": "string",
+            "description": "Наименования группы."
+          }
+        }
+      },
+      "groupsPageResponse": {
+        "description": "Возвращаемая выборка из всех групп отсортированных по идентификатору.",
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/pageMetaResponse"
+          },
+          "data": {
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string",
-                  "examples": ["string"]
-                }
-              }
+              "$ref": "#/components/schemas/groupResponse"
             }
           }
         }
       },
-      "cridentialForEnterRequest": {
+      "newStudentRequest": {
+        "description": "Данные нового добавляемого студента",
         "type": "object",
+        "required": ["firstName", "secondName", "middleName", "birthday"],
         "properties": {
-          "loggin": {
+          "firstName": {
             "type": "string",
-            "description": "Логин пользователя.\n\nОграничения:\nДолжен содержать как минимум один отображаемый символ.\nКол-во символов должно быть в диапозоне [1, 20].\nДолжен быть уникален среди других пользователей."
+            "description": "Имя"
           },
-          "password": {
+          "secondName": {
             "type": "string",
-            "description": "Пароль пользователя.\n\nОграничения:\nДолжен содержать как минимум один отображаемый символ.\nКол-во символов должно быть в диапозоне [8, 50]."
+            "description": "Фамилия"
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Отчество"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Дата рождения"
+          },
+          "groupId": {
+            "type": "number",
+            "description": "Идентификатор группы, в которой учится студент"
           }
         }
       },
-      "cridentialForRegistrationRequest": {
+      "deleteStudentRequest": {
+        "description": "Данные идентифицирующие удаляемого студента",
         "type": "object",
+        "required": ["id"],
         "properties": {
-          "loggin": {
-            "type": "string",
-            "description": "Логин пользователя.\n\nОграничения:\nДолжен содержать как минимум один отображаемый символ.\nКол-во символов должно быть в диапозоне [1, 20].\nДолжен быть уникален среди других пользователей."
-          },
-          "email": {
-            "type": "string",
-            "description": "Почта пользователя.\n\nОграничения:\nЗадаваемое значение должно представлять корректный аддрес электронной почты.\nУказываемая почта должна существовать."
-          },
-          "password": {
-            "type": "string",
-            "description": "Пароль пользователя.\n\nОграничения:\nДолжен содержать как минимум один отображаемый символ.\nКол-во символов должно быть в диапозоне [8, 50]."
+          "id": {
+            "type": "number",
+            "description": "Идентификатор студента"
           }
         }
-      }
-    },
-    "securitySchemes": {
-      "commonAuthKey": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
       },
-      "registrationAuthKey": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+      "studentResponse": {
+        "description": "Возвращаемые данные об одном конкретном студенте.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Идентификатор студента"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Имя"
+          },
+          "secondName": {
+            "type": "string",
+            "description": "Фамилия"
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Отчество"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Год рождения"
+          },
+          "group": {
+            "$ref": "#/components/schemas/groupResponse"
+          }
+        }
+      },
+      "studentsPageResponse": {
+        "description": "Возвращаемая выборка из всех студентов отсортированных по идентификатору.",
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/pageMetaResponse"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "$ref": "#/components/schemas/groupResponse"
+            }
+          }
+        }
       }
     }
   }

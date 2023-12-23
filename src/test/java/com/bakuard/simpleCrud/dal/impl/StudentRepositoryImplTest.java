@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 class StudentRepositoryImplTest {
 
@@ -113,6 +114,28 @@ class StudentRepositoryImplTest {
 
         Assertions.assertThatThrownBy(() -> commit(() -> studentRepository.add(duplicate)))
                 .isInstanceOf(DuplicateStudentException.class);
+    }
+
+    @DisplayName("""
+            add(newStudent):
+             student hasn't group
+             => add student
+            """)
+    @Test
+    void add3() {
+        Student student = new Student()
+                .setFirstName("first1")
+                .setSecondName("second1")
+                .setMiddleName("middle1")
+                .setBirthday(LocalDate.of(2022, 12, 2))
+                .setGroup(null);
+
+        commit(() -> studentRepository.add(student));
+        Student actual = studentRepository.tryGetById(student.getId());
+
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
+                .isEqualTo(student);
     }
 
     @DisplayName("""
@@ -290,6 +313,69 @@ class StudentRepositoryImplTest {
                 .isEqualTo(new Page<>(
                         new PageMeta(10, 0, 0),
                         List.of()
+                ));
+    }
+
+    @DisplayName("""
+            getAll(pageNumber, pageSize):
+             there are students without groups
+             => return empty page
+            """)
+    @Test
+    void getAll6() {
+        commit(() -> {
+            IntStream.rangeClosed(1, 15)
+                            .forEach(
+                                    i -> studentRepository.add(
+                                            new Student()
+                                                    .setFirstName("first" + i)
+                                                    .setSecondName("second" + i)
+                                                    .setMiddleName("middle" + i)
+                                                    .setBirthday(LocalDate.of(2000, 12, 2))
+                                                    .setGroup(groups.getFirst())
+                                    )
+                            );
+            IntStream.rangeClosed(16, 30)
+                    .forEach(
+                            i -> studentRepository.add(
+                                    new Student()
+                                            .setFirstName("first" + i)
+                                            .setSecondName("second" + i)
+                                            .setMiddleName("middle" + i)
+                                            .setBirthday(LocalDate.of(1995, 6, 18))
+                                            .setGroup(null)
+                            )
+                    );
+        });
+
+        Page<Student> actual = studentRepository.getAll(1, 10);
+
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
+                .isEqualTo(new Page<>(
+                        new PageMeta(10, 1, 30),
+                        Stream.concat(
+                                IntStream.rangeClosed(11, 15)
+                                        .mapToObj(i ->
+                                                new Student()
+                                                        .setId(i)
+                                                        .setFirstName("first" + i)
+                                                        .setSecondName("second" + i)
+                                                        .setMiddleName("middle" + i)
+                                                        .setBirthday(LocalDate.of(2000, 12, 2))
+                                                        .setGroup(groups.getFirst())
+                                        ),
+                                IntStream.rangeClosed(16, 20)
+                                        .mapToObj(i ->
+                                                new Student()
+                                                        .setId(i)
+                                                        .setFirstName("first" + i)
+                                                        .setSecondName("second" + i)
+                                                        .setMiddleName("middle" + i)
+                                                        .setBirthday(LocalDate.of(1995, 6, 18))
+                                                        .setGroup(null)
+                                        )
+                        ).toList()
                 ));
     }
 
