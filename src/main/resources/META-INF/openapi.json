@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Crazy Farm",
-    "description": "Official Crazy Farm API",
+    "title": "Students service",
+    "description": "Students service",
     "version": "0.1.0"
   },
   "paths": {
@@ -45,7 +45,7 @@
         }
       }
     },
-    "/groups/id": {
+    "/groups/{id}": {
       "get": {
         "tags": ["Группы студентов"],
         "summary": "Возвращает группу по её идентификатору",
